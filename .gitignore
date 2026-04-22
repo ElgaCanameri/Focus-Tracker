@@ -1,0 +1,48 @@
+# Build outputs
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docobj
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+
+# Environment & Secrets
+appsettings.Development.json
+appsettings.Production.json
+.env
+TestResults/
+coverage-report/
+**/coverage-report/
+**/TestResults/
+session-crash.log
+**/*.log
+*.pfx
+*.p12
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test results & coverage
+TestResults/
+coverage/
+*.trx
+*.coveragexml
