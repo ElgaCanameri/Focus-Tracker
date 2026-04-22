@@ -4,7 +4,7 @@ Backend platform for logging deep-work and learning sessions, earning daily badg
 
 Built on .NET 8 with Clean Architecture, CQRS-style read models, MassTransit over RabbitMQ for async events, SignalR for realtime notifications, and Auth0 via OIDC + PKCE.
 
-![Architecture](docs/architecture.png)
+![Architecture](docs/focustrack_architecture.svg)
 
 ## One-command startup
 
@@ -144,5 +144,5 @@ FocusTrack/
 ├── FocusTrack.Gateway/           # YARP + OIDC + middleware
 ├── tests/                        # Unit + integration tests
 ├── ops/prometheus/               # Scrape config + alert rules
-└── docs/architecture.png
+└── docs/focustrack_architecture.svg
 ```
