@@ -34,7 +34,14 @@ builder.Host.UseSerilog((ctx, config) =>
 
 builder.Services.AddControllers();  // needed for AuthController (login/logout)
 builder.Services.AddHealthChecks(); // needed for /healthz and /readyz endpoints
-
+builder.Services.AddHttpClient("SessionService", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7022/");
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+});
 //MassTransit
 builder.Services.AddMassTransit(x =>
 {
@@ -165,19 +172,27 @@ builder.Services.AddAuthentication(options =>
 
             if (userId != null)
             {
-                // Check suspension via Session service HTTP call
-                var httpClient = ctx.HttpContext.RequestServices
-                    .GetRequiredService<IHttpClientFactory>()
-                    .CreateClient("SessionService");
-
-                var encodedId = Uri.EscapeDataString(userId);
-                var isSuspended = await httpClient
-                    .GetFromJsonAsync<bool>($"internal/users/{encodedId}/is-suspended");
-
-                if (isSuspended)
+                try
                 {
-                    ctx.Fail("User is suspended.");
-                    return;
+                    var httpClient = ctx.HttpContext.RequestServices
+                        .GetRequiredService<IHttpClientFactory>()
+                        .CreateClient("SessionService");
+
+                    var encodedId = Uri.EscapeDataString(userId);
+                    var isSuspended = await httpClient
+                        .GetFromJsonAsync<bool>($"internal/users/{encodedId}/is-suspended");
+
+                    Console.WriteLine($"[OnTokenValidated] UserId={userId}, IsSuspended={isSuspended}");
+
+                    if (isSuspended)
+                    {
+                        ctx.Fail("User is suspended.");
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Could not check suspension status for {UserId}. Allowing login.", userId);
                 }
 
                 var bus = ctx.HttpContext.RequestServices

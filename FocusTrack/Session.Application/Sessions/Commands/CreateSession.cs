@@ -76,6 +76,14 @@ public class CreateSessionHandler : IRequestHandler<CreateSessionCommand, Guid>
             request.Mode);
 
         await _repository.AddAsync(session, ct);
+       
+        await _repository.UpdateMonthlyStatisticsAsync(
+           session.UserId,
+           session.StartTime.Year,
+           session.StartTime.Month,
+           session.DurationMin.Value,
+           ct);
+
         await _unitOfWork.SaveChangesAsync(ct);
 
         // publish to RabbitMQ → RewardWorker listens

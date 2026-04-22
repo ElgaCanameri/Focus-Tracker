@@ -35,6 +35,8 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<Notification.Presentation.Consumers.SessionSharedConsumer>();
     x.AddConsumer<Notification.Presentation.Consumers.DailyGoalAchievedConsumer>();
+    x.AddConsumer<Notification.Presentation.Consumers.UserLoggedInConsumer>();
+
 
     x.UsingRabbitMq((ctx, cfg) =>
     {

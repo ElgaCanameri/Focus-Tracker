@@ -1,4 +1,5 @@
 ﻿using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MimeKit;
@@ -32,13 +33,19 @@ public class EmailService : IEmailService
 
         using var client = new SmtpClient();
         await client.ConnectAsync(
-            _configuration["Email:Host"],
-            int.Parse(_configuration["Email:Port"]!),
-            false, ct);
+             _configuration["Email:Host"],
+             int.Parse(_configuration["Email:Port"]!),
+             SecureSocketOptions.None,
+             ct);
 
-        await client.AuthenticateAsync(
-            _configuration["Email:Username"],
-            _configuration["Email:Password"], ct);
+        var username = _configuration["Email:Username"];
+        if (!string.IsNullOrWhiteSpace(username))
+        {
+            await client.AuthenticateAsync(
+                username,
+                _configuration["Email:Password"],
+                ct);
+        }
 
         await client.SendAsync(message, ct);
         await client.DisconnectAsync(true, ct);

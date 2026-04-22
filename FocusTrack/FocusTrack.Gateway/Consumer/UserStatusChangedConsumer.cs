@@ -10,10 +10,14 @@ namespace FocusTrack.Gateway.Consumer
 
         public Task Consume(ConsumeContext<UserStatusChangedEvent> ctx)
         {
+            Console.WriteLine($"[Consumer] Received UserStatusChangedEvent: UserId={ctx.Message.UserId}, NewStatus={ctx.Message.NewStatus}");
+
             if (ctx.Message.NewStatus == "Suspended")
                 _cache.Add(ctx.Message.UserId);
             else
-                _cache.Remove(ctx.Message.UserId); // un-suspend
+                _cache.Remove(ctx.Message.UserId);
+
+            Console.WriteLine($"[Consumer] Cache updated");
             return Task.CompletedTask;
         }
     }

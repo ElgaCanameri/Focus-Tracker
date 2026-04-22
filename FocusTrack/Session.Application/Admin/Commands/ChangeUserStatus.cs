@@ -70,10 +70,14 @@ public class ChangeUserStatusHandler : IRequestHandler<ChangeUserStatusCommand>
         await _unitOfWork.SaveChangesAsync(ct);
 
         // publish event
+        Console.WriteLine($"[Handler] PUBLISHING UserStatusChangedEvent - ExternalId={user.ExternalId}, NewStatus={request.NewStatus}");
+
         await _publishEndpoint.Publish(new UserStatusChangedEvent(
-            user.Id.ToString(),
+            user.ExternalId,
             oldStatus.ToString(),
             request.NewStatus.ToString(),
             DateTime.UtcNow), ct);
+
+        Console.WriteLine($"[Handler] PUBLISHED");
     }
 }
